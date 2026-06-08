@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+*.h5
+*.keras
+*.tflite
+
+.DS_Store
+.vscode/
+.pio/
+build/
