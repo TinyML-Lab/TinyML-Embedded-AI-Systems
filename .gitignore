@@ -12,3 +12,4 @@ venv/
 .vscode/
 .pio/
 build/
+project_01_human_activity_recognition/data/raw/*.csv
