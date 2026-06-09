@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <math.h>
 
 #define MPU6050_ADDR 0x68
 
@@ -16,6 +17,10 @@
 #define GYRO_SCALE_FACTOR 131.0f
 
 #define CALIBRATION_SAMPLES 500
+#define SAMPLE_INTERVAL_MS 20
+
+String current_label = "idle";
+unsigned long last_sample_time = 0;
 
 struct ImuRawData {
     int16_t acc_x;
@@ -125,8 +130,7 @@ ImuData applyCalibration(const ImuData &data) {
 }
 
 void calibrateMpu6050() {
-    Serial.println("Calibration started.");
-    Serial.println("Keep the sensor completely still...");
+    Serial.println("# Calibration started. Keep sensor still.");
 
     float acc_x_sum = 0;
     float acc_y_sum = 0;
@@ -157,11 +161,6 @@ void calibrateMpu6050() {
         delay(5);
     }
 
-    if (valid_samples == 0) {
-        Serial.println("Calibration failed. No valid samples.");
-        return;
-    }
-
     float acc_x_avg = acc_x_sum / valid_samples;
     float acc_y_avg = acc_y_sum / valid_samples;
     float acc_z_avg = acc_z_sum / valid_samples;
@@ -190,31 +189,60 @@ void calibrateMpu6050() {
     offsets.gyro_y_offset = gyro_y_sum / valid_samples;
     offsets.gyro_z_offset = gyro_z_sum / valid_samples;
 
-    Serial.println("Calibration done.");
-    Serial.print("Accel offsets: ");
-    Serial.print(offsets.acc_x_offset, 4); Serial.print(", ");
-    Serial.print(offsets.acc_y_offset, 4); Serial.print(", ");
-    Serial.println(offsets.acc_z_offset, 4);
+    Serial.println("# Calibration done.");
+}
 
-    Serial.print("Gyro offsets: ");
-    Serial.print(offsets.gyro_x_offset, 4); Serial.print(", ");
-    Serial.print(offsets.gyro_y_offset, 4); Serial.print(", ");
-    Serial.println(offsets.gyro_z_offset, 4);
+void handleSerialCommand() {
+    if (!Serial.available()) {
+        return;
+    }
+
+    String command = Serial.readStringUntil('\n');
+    command.trim();
+
+    if (command.startsWith("label=")) {
+        current_label = command.substring(6);
+        current_label.trim();
+
+        Serial.print("# Label changed to: ");
+        Serial.println(current_label);
+    }
+}
+
+void printCsvHeader() {
+    Serial.println("timestamp_ms,acc_x_g,acc_y_g,acc_z_g,gyro_x_dps,gyro_y_dps,gyro_z_dps,label");
+}
+
+void printCsvLine(const ImuData &imu) {
+    Serial.print(millis());
+    Serial.print(",");
+    Serial.print(imu.acc_x_g, 4);
+    Serial.print(",");
+    Serial.print(imu.acc_y_g, 4);
+    Serial.print(",");
+    Serial.print(imu.acc_z_g, 4);
+    Serial.print(",");
+    Serial.print(imu.gyro_x_dps, 4);
+    Serial.print(",");
+    Serial.print(imu.gyro_y_dps, 4);
+    Serial.print(",");
+    Serial.print(imu.gyro_z_dps, 4);
+    Serial.print(",");
+    Serial.println(current_label);
 }
 
 void setup() {
     Serial.begin(115200);
     delay(2000);
 
-    Serial.println();
-    Serial.println("ESP32-S3 MPU6050 Calibration Test");
+    Serial.println("# ESP32-S3 MPU6050 CSV Logger");
 
     Wire.begin(I2C_SDA_PIN, I2C_SCL_PIN);
     Wire.setClock(100000);
 
     uint8_t who_am_i = readMpuRegister(MPU6050_WHO_AM_I);
 
-    Serial.print("MPU6050 WHO_AM_I: 0x");
+    Serial.print("# MPU6050 WHO_AM_I: 0x");
     Serial.println(who_am_i, HEX);
 
     writeMpuRegister(MPU6050_PWR_MGMT_1, 0x00);
@@ -223,32 +251,28 @@ void setup() {
     writeMpuRegister(MPU6050_ACCEL_CONFIG, 0x00);
     writeMpuRegister(MPU6050_GYRO_CONFIG, 0x00);
 
-    Serial.println("Accel range: +/-2g");
-    Serial.println("Gyro range: +/-250 deg/s");
-
     calibrateMpu6050();
 
-    Serial.println("MPU6050 initialization done");
-    Serial.println();
+    Serial.println("# Send command like: label=shake");
+    printCsvHeader();
 }
 
 void loop() {
+    handleSerialCommand();
+
+    unsigned long now = millis();
+
+    if (now - last_sample_time < SAMPLE_INTERVAL_MS) {
+        return;
+    }
+
+    last_sample_time = now;
+
     ImuRawData raw;
 
     if (readMpuRawData(raw)) {
         ImuData unit = convertRawData(raw);
         ImuData calibrated = applyCalibration(unit);
-
-        Serial.print("CAL | ");
-        Serial.print("acc_x_g: "); Serial.print(calibrated.acc_x_g, 3);
-        Serial.print(" | acc_y_g: "); Serial.print(calibrated.acc_y_g, 3);
-        Serial.print(" | acc_z_g: "); Serial.print(calibrated.acc_z_g, 3);
-        Serial.print(" | gyro_x_dps: "); Serial.print(calibrated.gyro_x_dps, 3);
-        Serial.print(" | gyro_y_dps: "); Serial.print(calibrated.gyro_y_dps, 3);
-        Serial.print(" | gyro_z_dps: "); Serial.println(calibrated.gyro_z_dps, 3);
-    } else {
-        Serial.println("Failed to read MPU6050 data.");
+        printCsvLine(calibrated);
     }
-
-    delay(500);
 }
