@@ -1,0 +1,11 @@
+{
+    "backward_motion": 0,
+    "circular_motion": 1,
+    "fall_detection": 2,
+    "forward_motion": 3,
+    "gesture_recognition": 4,
+    "idle": 5,
+    "left_tilt": 6,
+    "right_tilt": 7,
+    "shake": 8
+}

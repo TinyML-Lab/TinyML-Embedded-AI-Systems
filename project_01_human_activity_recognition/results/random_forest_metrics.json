@@ -1,0 +1,89 @@
+{
+    "model": "RandomForestClassifier",
+    "features_file": "/home/abdo/Workspace/ITI/Projects/TinyML-Embedded-AI-Systems/project_01_human_activity_recognition/data/processed/imu_statistical_features.csv",
+    "num_total_windows": 1043,
+    "num_train_windows": 834,
+    "num_test_windows": 209,
+    "accuracy": 0.9952153110047847,
+    "labels": [
+        "backward_motion",
+        "circular_motion",
+        "fall_detection",
+        "forward_motion",
+        "gesture_recognition",
+        "idle",
+        "left_tilt",
+        "right_tilt",
+        "shake"
+    ],
+    "classification_report": {
+        "backward_motion": {
+            "precision": 0.9583333333333334,
+            "recall": 1.0,
+            "f1-score": 0.9787234042553191,
+            "support": 23.0
+        },
+        "circular_motion": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 23.0
+        },
+        "fall_detection": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 23.0
+        },
+        "forward_motion": {
+            "precision": 1.0,
+            "recall": 0.9565217391304348,
+            "f1-score": 0.9777777777777777,
+            "support": 23.0
+        },
+        "gesture_recognition": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 24.0
+        },
+        "idle": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 23.0
+        },
+        "left_tilt": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 23.0
+        },
+        "right_tilt": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 24.0
+        },
+        "shake": {
+            "precision": 1.0,
+            "recall": 1.0,
+            "f1-score": 1.0,
+            "support": 23.0
+        },
+        "accuracy": 0.9952153110047847,
+        "macro avg": {
+            "precision": 0.9953703703703705,
+            "recall": 0.9951690821256037,
+            "f1-score": 0.9951667980036775,
+            "support": 209.0
+        },
+        "weighted avg": {
+            "precision": 0.9954146730462521,
+            "recall": 0.9952153110047847,
+            "f1-score": 0.9952130487404842,
+            "support": 209.0
+        }
+    },
+    "model_path": "/home/abdo/Workspace/ITI/Projects/TinyML-Embedded-AI-Systems/project_01_human_activity_recognition/models/saved_models/random_forest_model.joblib"
+}

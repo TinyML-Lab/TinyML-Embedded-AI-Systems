@@ -1,0 +1,10 @@
+,backward_motion,circular_motion,fall_detection,forward_motion,gesture_recognition,idle,left_tilt,right_tilt,shake
+backward_motion,23,0,0,0,0,0,0,0,0
+circular_motion,0,23,0,0,0,0,0,0,0
+fall_detection,0,0,23,0,0,0,0,0,0
+forward_motion,1,0,0,22,0,0,0,0,0
+gesture_recognition,0,0,0,0,24,0,0,0,0
+idle,0,0,0,0,0,23,0,0,0
+left_tilt,0,0,0,0,0,0,23,0,0
+right_tilt,0,0,0,0,0,0,0,24,0
+shake,0,0,0,0,0,0,0,0,23

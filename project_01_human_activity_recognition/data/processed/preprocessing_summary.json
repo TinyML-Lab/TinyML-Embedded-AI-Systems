@@ -1,0 +1,30 @@
+{
+    "window_size": 50,
+    "stride": 10,
+    "sensor_columns": [
+        "acc_x_g",
+        "acc_y_g",
+        "acc_z_g",
+        "gyro_x_dps",
+        "gyro_y_dps",
+        "gyro_z_dps"
+    ],
+    "num_classes": 9,
+    "total_windows": 1043,
+    "windows_per_label": {
+        "backward_motion": 116,
+        "circular_motion": 115,
+        "fall_detection": 116,
+        "forward_motion": 116,
+        "gesture_recognition": 116,
+        "idle": 116,
+        "left_tilt": 116,
+        "right_tilt": 116,
+        "shake": 116
+    },
+    "raw_windows_shape": [
+        1043,
+        50,
+        6
+    ]
+}
