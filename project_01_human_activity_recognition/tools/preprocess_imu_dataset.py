@@ -6,6 +6,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from scipy.signal import find_peaks
 
 
 SENSOR_COLUMNS = [
@@ -48,6 +49,9 @@ def extract_features(window):
         features[f"{column}_rms"] = np.sqrt(np.mean(values ** 2))
         features[f"{column}_energy"] = np.sum(values ** 2)
 
+        peaks, _ = find_peaks(values, distance=3, height=np.mean(values))
+        features[f"{column}_peaks"] = len(peaks)
+
     acc_mag = np.sqrt(
         window["acc_x_g"] ** 2 +
         window["acc_y_g"] ** 2 +
@@ -66,6 +70,21 @@ def extract_features(window):
     features["gyro_mag_mean"] = np.mean(gyro_mag)
     features["gyro_mag_std"] = np.std(gyro_mag)
     features["gyro_mag_max"] = np.max(gyro_mag)
+
+    acc_abs_sum = (
+        np.abs(window["acc_x_g"].to_numpy(dtype=np.float32))
+        + np.abs(window["acc_y_g"].to_numpy(dtype=np.float32))
+        + np.abs(window["acc_z_g"].to_numpy(dtype=np.float32))
+    )
+
+    gyro_abs_sum = (
+        np.abs(window["gyro_x_dps"].to_numpy(dtype=np.float32))
+        + np.abs(window["gyro_y_dps"].to_numpy(dtype=np.float32))
+        + np.abs(window["gyro_z_dps"].to_numpy(dtype=np.float32))
+    )
+
+    features["acc_sma"] = np.mean(acc_abs_sum)
+    features["gyro_sma"] = np.mean(gyro_abs_sum)
 
     return features
 
